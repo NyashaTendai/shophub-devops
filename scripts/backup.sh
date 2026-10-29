@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-SRC="/var/www/html"
+SRC="/var/www/shophub"
 DEST="$HOME/backups"
 STAMP=$(date +%Y-%m-%d_%H%M)
 FILE="$DEST/site_$STAMP.tar.gz"
