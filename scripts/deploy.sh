@@ -2,7 +2,7 @@
 set -euo pipefail
 
 REPO="$HOME/shophub-devops"
-TARGET="/var/www/shophub"
+NAME="shophub"
 MIN_SIZE="${MIN_SIZE:-200}"
 
 cd "$REPO"
@@ -14,8 +14,13 @@ if [ "$SIZE" -lt "$MIN_SIZE" ]; then
   exit 1
 fi
 
-sudo cp -r site/. "$TARGET/"
-sudo nginx -t
-sudo systemctl reload nginx
+TAG=$(git rev-parse --short HEAD)
+sudo docker build -t "$NAME:$TAG" .
+
+sudo docker stop "$NAME" || true
+sudo docker rm "$NAME" || true
+sudo docker run -d --name "$NAME" --restart unless-stopped -p 80:80 "$NAME:$TAG"
+
+sleep 2
 curl -fsS -o /dev/null http://localhost
-echo "Deploy OK: $SIZE bytes served from $TARGET"
+echo "Deploy OK: $SIZE bytes, image $NAME:$TAG"
