@@ -1,6 +1,11 @@
 #!/bin/bash
 set -euo pipefail
 
+if [ "$(hostname)" != "linux-lab" ]; then
+  echo "ERROR: run this on the VM (linux-lab), not here. This is: $(hostname)"
+  exit 1
+fi
+
 REPO="$HOME/shophub-devops"
 NAME="shophub"
 MIN_SIZE="${MIN_SIZE:-200}"
