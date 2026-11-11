@@ -1,0 +1,8 @@
+services:
+  shophub:
+    build: .
+    image: shophub:compose
+    container_name: shophub
+    ports:
+      - "80:80"
+    restart: unless-stopped
