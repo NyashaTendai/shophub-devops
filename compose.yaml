@@ -1,7 +1,7 @@
 services:
   shophub:
     build: .
-    image: shophub:compose
+    image: shophub:${TAG:-compose}
     container_name: shophub
     ports:
       - "80:80"
