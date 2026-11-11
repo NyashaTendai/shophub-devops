@@ -92,3 +92,26 @@ I rebooted the VM on purpose. Afterwards the container came back by itself (`Up 
 - Only one program can listen on a port. Check with `ss` before changing anything.
 - Docker publishes ports by its own firewall rules, so `ufw` alone does not control what a container exposes. Check from outside, and keep the cloud firewall tight.
 - Run server commands on the server. Several mistakes came from running `deploy.sh`, `git commit` and `git push` in the wrong terminal.
+cat >> README.md <<'EOF'
+
+## Part 8: CI/CD with GitHub Actions
+
+Every push to `main` now tests and deploys ShopHub automatically.
+
+**Pipeline** (`.github/workflows/deploy.yml`)
+1. `check` job: fails if `site/index.html` is under 200 bytes (stops an empty or broken page).
+2. `deploy` job (runs only if `check` passes): connects to the VM over SSH and runs `scripts/deploy.sh`, which rebuilds and restarts the Docker container.
+
+**Security: least privilege**
+- A dedicated ed25519 deploy key, separate from my personal key.
+- On the VM the key is locked with a forced command in `authorized_keys`, so it can only run `deploy.sh` (no shell, no port forwarding, no PTY).
+- The private key, VM address and username are stored as GitHub Actions secrets, not in the repo.
+
+**Negative test**
+I pushed a deliberately broken 5-byte page. The `check` job failed (`index.html is 5 bytes`), the deploy was skipped, and the live site kept serving the good page. I then ran `git revert` and the pipeline deployed the restored page.
+
+**What I learned**
+- CI (automatic testing) and CD (automatic deployment) are separate steps, and CD should depend on CI.
+- A green tick is not proof. I verified the live site with `curl` after each deploy.
+- Test your safety nets by breaking things on purpose.
+EOF
